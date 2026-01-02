@@ -5,11 +5,11 @@ import Timeline from '@/components/Timeline';
 /**
  * Reads, sorts, and prepares regulation data on the server.
  */
-async function getTimelineData() {
+function getTimelineData() {
   const regulations = regulationsData as RegulationEntry[];
 
-  // Sort regulations by date, newest first
-  const sortedRegulations = regulations.sort(
+  // Sort regulations by date, newest first (create a copy to avoid mutation)
+  const sortedRegulations = [...regulations].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
@@ -20,8 +20,8 @@ async function getTimelineData() {
   return { sortedRegulations, regions, industries };
 }
 
-export default async function HomePage() {
-  const { sortedRegulations, regions, industries } = await getTimelineData();
+export default function HomePage() {
+  const { sortedRegulations, regions, industries } = getTimelineData();
 
   return (
     <main className="container">

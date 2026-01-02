@@ -5,13 +5,18 @@ import { RegulationEntry } from '@/data/types';
  * into a readable format (e.g., "December 4, 2024").
  */
 const formatDate = (dateString: string) => {
-  // Add timeZone: 'UTC' to prevent off-by-one-day errors
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  });
+  try {
+    const date = new Date(dateString + 'T00:00:00Z'); // Explicitly set to UTC midnight
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    });
+  } catch (error) {
+    // Fallback to original string if date parsing fails
+    return dateString;
+  }
 };
 
 interface RegulationCardProps {
@@ -20,7 +25,8 @@ interface RegulationCardProps {
 
 export default function RegulationCard({ entry }: RegulationCardProps) {
   // Create a URL-friendly slug for the status class
-  const statusClass = `status-${entry.status.toLowerCase().replace(/[\s()]/g, '-')}`;
+  // Handle parentheses and other special characters
+  const statusClass = `status-${entry.status.toLowerCase().replace(/[\s()]/g, '-').replace(/--+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
     <article className="regulation-card">
